@@ -1,8 +1,29 @@
+---
+title: 树莓派舵机控制技能
+description: 使用树莓派控制舵机，实现精确角度控制
+version: 1.0.0
+author: zhaohongbo
+tags:
+  - 树莓派
+  - 舵机
+  - 电子
+  - 机械臂
+  - 云台
+requireHardware: true
+dependencies:
+  - RPi.GPIO
+compatibility:
+  - 树莓派
+created: 2026-03-13
+updated: 2026-03-13
+license: MIT
+---
+
 # 树莓派舵机控制技能
 
 ## 技能概述
 
-这个技能允许你使用树莓派控制舵机，从基础的单舵机控制到复杂的多舵机协同工作。无论是制作机械臂、云台还是其他需要精确角度控制的项目，这个技能都能帮到你。
+这个OpenClaw技能允许你使用树莓派控制舵机，从基础的单舵机控制到复杂的多舵机协同工作。无论是制作机械臂、云台还是其他需要精确角度控制的项目，这个技能都能帮到你。
 
 ## 技能组件
 
@@ -14,6 +35,7 @@
 
 ## 所需硬件
 
+- OpenClaw机器人
 - 树莓派 (任何型号)
 - 舵机 (如SG90、MG996R等标准PWM舵机)
 - 面包板和跳线
@@ -39,20 +61,26 @@
 
 ## 安装步骤
 
-1. **安装必要的软件包**:
+1. **在OpenClaw中安装此技能**:
+   ```bash
+   # 使用OpenClaw CLI安装技能
+   openclaw skill install raspberry-servo
+   ```
+
+2. **手动安装必要的软件包**（如果OpenClaw自动安装失败）:
    ```bash
    sudo apt-get update
    sudo apt-get install python3-pip
    sudo pip3 install RPi.GPIO
    ```
 
-2. **下载控制脚本**:
+3. **下载控制脚本**（手动安装时）:
    ```bash
    wget -O servo_control.py https://raw.githubusercontent.com/zhaohongbogit/openclaw-zhb-skill/refs/heads/main/raspberry-servo/servo_control.py
    wget -O multi_servo_demo.py https://raw.githubusercontent.com/zhaohongbogit/openclaw-zhb-skill/refs/heads/main/raspberry-servo/multi_servo_demo.py
    ```
 
-3. **设置权限**:
+4. **设置权限**（手动安装时）:
    ```bash
    chmod +x servo_control.py
    chmod +x multi_servo_demo.py
@@ -60,21 +88,37 @@
 
 ## 使用方法
 
-### 基础舵机控制
+### 通过OpenClaw使用
+
+在OpenClaw中调用技能：
+```bash
+# 基础舵机控制
+openclaw run raspberry-servo --mode=basic
+
+# 多舵机控制
+openclaw run raspberry-servo --mode=multi --demo
+
+# 交互式控制
+openclaw run raspberry-servo --mode=interactive
+```
+
+### 直接运行脚本（手动安装时）
+
+#### 基础舵机控制
 
 运行基础演示程序：
 ```bash
 python3 servo_control.py
 ```
 
-### 多舵机控制
+#### 多舵机控制
 
 运行多舵机演示程序：
 ```bash
 python3 multi_servo_demo.py --demo
 ```
 
-### 交互式控制
+#### 交互式控制
 
 启动交互式控制：
 ```bash
@@ -337,6 +381,49 @@ servo = ServoController(18, min_pulse_width=0.6, max_pulse_width=2.4)
 - 使用`GPIO.setwarnings(False)`消除警告
 - 确保程序正常终止并调用cleanup()
 
+## 在OpenClaw中使用
+
+### 通过语音控制
+
+使用OpenClaw的语音识别功能控制舵机：
+
+```
+"打开舵机控制"
+"舵机1转到90度"
+"舵机2平滑转到45度"
+"启动扫描模式"
+"所有舵机回到中心"
+"停止舵机控制"
+```
+
+### 与其他OpenClaw技能集成
+
+```python
+# 结合摄像头追踪技能和舵机控制
+from openclaw.skills import RaspberryServo, CameraTracker
+
+# 初始化技能
+servo_skill = RaspberryServo()
+camera_skill = CameraTracker()
+
+# 创建云台
+pan_servo = servo_skill.add_servo("pan", 18)
+tilt_servo = servo_skill.add_servo("tilt", 19)
+
+# 设置跟踪回调
+def tracking_callback(x, y):
+    # 将坐标转换为舵机角度
+    pan_angle = 90 + (x - 0.5) * 90
+    tilt_angle = 90 + (y - 0.5) * 90
+
+    # 移动舵机
+    servo_skill.set_angle("pan", pan_angle)
+    servo_skill.set_angle("tilt", tilt_angle)
+
+# 开始追踪
+camera_skill.start_tracking(tracking_callback)
+```
+
 ## 项目示例
 
 ### 1. 简单的云台项目
@@ -422,10 +509,32 @@ finally:
 - [RPi.GPIO库文档](https://sourceforge.net/p/raspberry-gpio-python/wiki/BasicUsage/)
 - [SG90舵机数据表](http://www.micropik.com/PDF/SG90Servo.pdf)
 - [树莓派GPIO针脚图](https://www.raspberrypi.org/documentation/usage/gpio/)
+- [OpenClaw技能文档](https://openclaw.org/docs/skills)
+
+## 技能配置
+
+在OpenClaw中，此技能可通过以下配置选项自定义：
+
+```json
+{
+  "default_servo_pin": 18,
+  "min_pulse_width": 0.5,
+  "max_pulse_width": 2.5,
+  "frequency": 50,
+  "enable_logging": true,
+  "safety_features": {
+    "max_current": 2000,
+    "temperature_threshold": 80,
+    "movement_timeout": 30
+  }
+}
+```
+
+可在OpenClaw配置界面或配置文件中修改这些选项。
 
 ## 作者
 
-作者：Claude
+作者：zhaohongbo
 
 ## 许可证
 
