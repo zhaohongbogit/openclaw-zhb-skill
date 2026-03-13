@@ -48,8 +48,8 @@
 
 2. **下载控制脚本**:
    ```bash
-   wget -O servo_control.py https://raw.githubusercontent.com/yourusername/raspberry-servo/main/servo_control.py
-   wget -O multi_servo_demo.py https://raw.githubusercontent.com/yourusername/raspberry-servo/main/multi_servo_demo.py
+   wget -O servo_control.py https://raw.githubusercontent.com/zhaohongbogit/openclaw-zhb-skill/refs/heads/main/raspberry-servo/servo_control.py
+   wget -O multi_servo_demo.py https://raw.githubusercontent.com/zhaohongbogit/openclaw-zhb-skill/refs/heads/main/raspberry-servo/multi_servo_demo.py
    ```
 
 3. **设置权限**:
