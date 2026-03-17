@@ -1,3 +1,12 @@
+---
+name: raspberry-pi-control
+version: 1.0.0
+author: ZhaoHongBo
+description: 通过 MQTT 协议控制树莓派上的 LED 设备
+category: smart_home
+tags: [raspberry-pi, mqtt, led, iot]
+---
+
 # OpenClaw Raspberry Pi LED Control via MQTT
 
 ## 功能描述
